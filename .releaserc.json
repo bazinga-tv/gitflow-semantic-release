@@ -16,10 +16,6 @@
                         "release": "patch"
                     },
                     {
-                        "type": "ci",
-                        "release": "patch"
-                    },
-                    {
                         "type": "chore",
                         "release": "patch"
                     },
