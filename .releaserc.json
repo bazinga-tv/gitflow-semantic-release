@@ -13,10 +13,6 @@
             {
                 "releaseRules": [
                     {
-                        "type": "build",
-                        "release": "patch"
-                    },
-                    {
                         "type": "chore",
                         "release": "patch"
                     },
