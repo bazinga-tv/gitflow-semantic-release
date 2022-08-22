@@ -3,7 +3,8 @@
         "main",
         {
             "name": "release-*",
-            "prerelease": "rc"
+            "channel": "rc",
+            "prerelease": true
         }
     ],
     "plugins": [
