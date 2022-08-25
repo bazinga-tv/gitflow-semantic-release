@@ -41,3 +41,5 @@ jobs:
         with:
           push: false
           tags: vmonjaret/nest:${{ needs.release.outputs.new_version }}
+      - name: Debug
+        run: echo "Image vmonjaret/nest:${{ needs.release.outputs.new_version }}"
