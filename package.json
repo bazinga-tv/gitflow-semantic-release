@@ -1,7 +1,7 @@
 {
   "name": "gitflow-semantic-release",
   "version": "1.2.0-rc.1",
-  "repository": "git@github.com:vmonjaret/gitflow-semantic-release.git",
+  "repository": "git@github.com:bazinga-tv/gitflow-semantic-release.git",
   "author": "Vincent Monjaret <vmonjaret@gmail.com>",
   "license": "MIT",
   "private": true,
