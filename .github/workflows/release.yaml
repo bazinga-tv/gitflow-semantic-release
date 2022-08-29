@@ -12,18 +12,37 @@ permissions:
 
 jobs:
   release:
-    name: Prerelease
+    name: Release
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          node-version: "16"
-      - name: Install semantic release
-        run: yarn install
+          fetch-depth: 0
+          persist-credentials: false
       - name: Semantic Release
-        run: yarn run semantic-release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          extra_plugins: |
+            @semantic-release/git
+            conventional-changelog-conventionalcommits
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  backmerge:
+    name: Backmerge to development
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Git config
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+      - name: Merge main in development
+        run: |
+          git checkout development
+          git merge main
