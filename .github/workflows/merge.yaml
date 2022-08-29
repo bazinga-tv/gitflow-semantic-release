@@ -8,7 +8,8 @@ on:
 
 jobs:
   merge:
-    if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
+    # if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
+    if: ${{ github.event.pull_request.head.ref }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
