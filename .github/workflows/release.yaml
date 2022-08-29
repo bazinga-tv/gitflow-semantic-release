@@ -42,5 +42,7 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+      - name: Merge master in development
+        run: |
           git checkout development
-          git merge origin master
+          git merge master
