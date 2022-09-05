@@ -9,7 +9,6 @@ on:
 jobs:
   merge:
     if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
-    # if: ${{ github.event.pull_request.head.ref }}
     runs-on: ubuntu-latest
     steps:
       - name: Debug
@@ -30,3 +29,8 @@ jobs:
           git checkout main
           git merge --ff-only origin/${{ github.event.pull_request.head.ref }}
           git push
+      - name: Remove label on failure
+        if: ${{ failure() }}
+        uses: andymckay/labeler@master
+        with:
+          remove-labels: "merge staging"
