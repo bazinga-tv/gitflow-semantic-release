@@ -1,0 +1,15 @@
+name: Deploy stage
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build stuff
+    steps:
+      - name: debug
+        run: echo "${{ toJSON(github.event) }}"
