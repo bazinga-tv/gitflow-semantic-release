@@ -11,10 +11,15 @@ jobs:
     if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Precondition
+        uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match
+        with:
+          text: ${{ github.event.pull_request.title }}
+          regex: '^chore\(([A-Z]+-[0-9]+)\)'
       - name: Debug
-        run: |
-          echo "Merging ${{ github.event.pull_request.head.ref }} into main"
-          echo "Mergeable: ${{ github.event.pull_request.mergeable }}"
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        run: echo "${{ steps.regex-match.outputs.group1 }}"
       - name: Checkout
         uses: actions/checkout@v3
         with:
