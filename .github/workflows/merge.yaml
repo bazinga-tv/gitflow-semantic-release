@@ -11,15 +11,15 @@ jobs:
     if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Precondition
+      - name: Check PR name
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
           text: ${{ github.event.pull_request.title }}
           regex: '^chore\(([A-Z]+-[0-9]+)\)'
       - name: Debug
-        if: ${{ steps.regex-match.outputs.match != '' }}
-        run: echo "${{ steps.regex-match.outputs.group1 }}"
+        if: ${{ steps.regex-match.outputs.match == '' }}
+        run: exit 1
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -39,3 +39,5 @@ jobs:
         uses: andymckay/labeler@master
         with:
           remove-labels: "merge staging"
+      - name: Curl test
+        run: curl --help
