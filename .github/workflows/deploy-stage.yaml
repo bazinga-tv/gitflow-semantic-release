@@ -9,8 +9,9 @@ on:
 
 jobs:
   build:
+    if: github.event_name == 'push' || (github.event_name == "workflow_dispatch" && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     name: Build stuff
     steps:
       - name: debug
-        run: echo "${{ toJSON(github.event) }}"
+        run: echo "test"
