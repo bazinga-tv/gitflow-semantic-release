@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name == 'push' || (github.event_name == "workflow_dispatch" && github.ref == 'refs/heads/main')
+    if: github.event_name == 'push' || (github.event_name == "workflow_dispatch" && github.ref == 'refs/heads/development')
     runs-on: ubuntu-latest
     name: Build stuff
     steps:
