@@ -1,24 +1,24 @@
-name: Merge
+name: Merge staging
 
 on:
   pull_request:
     types: [labeled]
     branches:
-      - main
+      - master
 
 jobs:
   merge:
     if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR name
+      - name: Checking PR name
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
           text: ${{ github.event.pull_request.title }}
           regex: '^chore\(([A-Z]+-[0-9]+)\)'
-      - name: Debug
-        if: ${{ steps.regex-match.outputs.match == '' }}
+      - name: Precondition
+        if: steps.regex-match.outputs.match == ''
         run: exit 1
       - name: Checkout
         uses: actions/checkout@v3
@@ -30,14 +30,14 @@ jobs:
           git config user.email github-actions@github.com
       - name: Fast forward
         run: |
-          echo "Merging ${{ github.event.pull_request.head.ref }} into main"
-          git checkout main
+          git checkout master
           git merge --ff-only origin/${{ github.event.pull_request.head.ref }}
           git push
+      - name: Call JIRA transition
+        run: |
+          curl -XPOST -H 'Authorization: Basic ${{ secrets.JIRA_AUTOMATION_TOKEN }}' -H "Content-type: application/json" -d '{"transition": {"id": 31}}' 'https://coachhub.atlassian.net/rest/api/2/issue/${{ steps.regex-match.outputs.group1 }}/transitions' 
       - name: Remove label on failure
         if: ${{ failure() }}
         uses: andymckay/labeler@master
         with:
           remove-labels: "merge staging"
-      - name: Curl test
-        run: curl --help
