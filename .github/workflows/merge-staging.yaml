@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [labeled]
     branches:
-      - master
+      - main
 
 jobs:
   merge:
@@ -30,7 +30,7 @@ jobs:
           git config user.email github-actions@github.com
       - name: Fast forward
         run: |
-          git checkout master
+          git checkout ${{ github.event.pull_request.base.ref }}
           git merge --ff-only origin/${{ github.event.pull_request.head.ref }}
           git push
       - name: Call JIRA transition
