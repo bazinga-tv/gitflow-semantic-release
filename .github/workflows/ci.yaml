@@ -13,7 +13,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
       - name: setup node
-        uses: actions/setup_node@v3
+        uses: actions/setup-node@v3
         with:
           version: 16
       - name: Caching dependencies
@@ -34,7 +34,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
       - name: setup node
-        uses: actions/setup_node@v3
+        uses: actions/setup-node@v3
         with:
           version: 16
           cache: yarn
