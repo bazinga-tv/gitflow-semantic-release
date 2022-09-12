@@ -41,7 +41,7 @@ jobs:
       - name: Merge master in development
         run: |
           git checkout development
-          git merge master
+          git merge main
 
   build-publish:
     needs: release
