@@ -15,7 +15,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v3
         with:
-          version: 16
+          node-version: 16
       - name: Caching dependencies
         id: cache-dependencies
         uses: actions/cache@v2
@@ -36,7 +36,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v3
         with:
-          version: 16
+          node-version: 16
           cache: yarn
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
