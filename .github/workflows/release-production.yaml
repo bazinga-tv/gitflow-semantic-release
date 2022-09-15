@@ -79,6 +79,7 @@ jobs:
         run: |
           git checkout development
           git merge origin/main
+          git push
 
   build-publish:
     needs: release
