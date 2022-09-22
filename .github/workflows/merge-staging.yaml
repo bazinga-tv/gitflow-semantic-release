@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check the PR
-        uses: bahmutov/should-run-github-action@v1
+        uses: vmonjaret/should-run-github-action@v1.0.0
         id: check-pr
+        with:
+          target: Merge in main
         env:
           GITHUB_EVENT: ${{ toJson(github.event) }}
       - name: Checking PR name
@@ -27,8 +29,9 @@ jobs:
         run: |
           echo "regex : '${{ steps.regex-match.outputs.match == '' }}'"
           echo "shouldRun : '${{ steps.check-pr.outputs.shouldRun }}'"
+          echo "precondition : '${{ !(steps.regex-match.outputs.match == '' || steps.check-pr.outputs.shouldRun == 'false') }}'"
       - name: Precondition
-        if: steps.regex-match.outputs.match == '' || steps.check-pr.outputs.shouldRun == false
+        if: ${{ !(steps.regex-match.outputs.match == '' || steps.check-pr.outputs.shouldRun == 'false') }}
         run: exit 1
       - name: Checkout
         uses: actions/checkout@v3
