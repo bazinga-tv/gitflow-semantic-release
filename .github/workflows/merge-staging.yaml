@@ -39,9 +39,9 @@ jobs:
           git checkout ${{ github.event.pull_request.base.ref }}
           git merge --ff-only origin/${{ github.event.pull_request.head.ref }}
           git push
-      - name: Call JIRA transition
-        run: |
-          curl -XPOST -H 'Authorization: Basic ${{ secrets.JIRA_AUTOMATION_TOKEN }}' -H "Content-type: application/json" -d '{"transition": {"id": 31}}' 'https://coachhub.atlassian.net/rest/api/2/issue/${{ steps.regex-match.outputs.group1 }}/transitions' 
+      # - name: Call JIRA transition
+      #   run: |
+      #     curl -XPOST -H 'Authorization: Basic ${{ secrets.JIRA_AUTOMATION_TOKEN }}' -H "Content-type: application/json" -d '{"transition": {"id": 31}}' 'https://coachhub.atlassian.net/rest/api/2/issue/${{ steps.regex-match.outputs.group1 }}/transitions' 
       - name: Remove label on failure
         if: ${{ failure() }}
         uses: andymckay/labeler@master
