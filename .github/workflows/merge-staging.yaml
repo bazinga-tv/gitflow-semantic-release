@@ -2,15 +2,21 @@ name: Merge staging
 
 on:
   pull_request:
-    types: [labeled]
+    types:
+      - edited
     branches:
       - main
 
 jobs:
   merge:
-    if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
+    # if: ${{ github.event.pull_request.mergeable && contains(github.event.pull_request.labels.*.name, 'merge staging') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Check the PR
+        uses: bahmutov/should-run-github-action@v1
+        id: check-pr
+        env:
+          GITHUB_EVENT: ${{ toJson(github.event) }}
       - name: Checking PR name
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
@@ -18,7 +24,7 @@ jobs:
           text: ${{ github.event.pull_request.title }}
           regex: '^chore\(([A-Z]+-[0-9]+)\)'
       - name: Precondition
-        if: steps.regex-match.outputs.match == ''
+        if: steps.regex-match.outputs.match == '' || steps.check-pr.outputs.shouldRun == false
         run: exit 1
       - name: Checkout
         uses: actions/checkout@v3
