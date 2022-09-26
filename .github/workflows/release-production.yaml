@@ -80,7 +80,7 @@ jobs:
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Run account container
-        run: docker run --name=tmp -d ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }}
+        run: docker run --name=tmp -d ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }} sh -c "while :; do echo 'Hit CTRL+C'; sleep 1; done" # Needed to avoid the container from failing
       - name: Get dist source code
         run: docker cp tmp:/usr/src/dist ./dist
       - name: Sentry Release
