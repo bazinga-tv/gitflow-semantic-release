@@ -63,10 +63,10 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag tmp ghcr.io/bazinga/semantic:latest
-          docker tag tmp ghcr.io/bazinga/semantic:${{ needs.release.outputs.new_version }}
-          docker push ghcr.io/bazinga/semantic:latest
-          docker push ghcr.io/bazinga/semantic:${{ needs.release.outputs.new_version }}
+          docker tag tmp ghcr.io/bazinga-tv/semantic:latest
+          docker tag tmp ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }}
+          docker push ghcr.io/bazinga-tv/semantic:latest
+          docker push ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }}
 
   sentry:
     name: Create Sentry release
@@ -80,7 +80,7 @@ jobs:
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Run account container
-        run: docker run --name=tmp -d ghcr.io/bazinga/semantic:${{ needs.release.outputs.new_version }}
+        run: docker run --name=tmp -d ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }}
       - name: Get dist source code
         run: docker cp tmp:/usr/src/dist ./dist
       - name: Sentry Release
