@@ -22,43 +22,7 @@ jobs:
             @semantic-release/git
             conventional-changelog-conventionalcommits
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  sentry:
-    name: Create Sentry release
-    runs-on: ubuntu-latest
-    needs: release
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup Node.JS
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: '.nvmrc'
-          cache: yarn
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock') }}
-      - name: Install Dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
-      - name: Build application
-        run: yarn run build
-      - name: Sentry Release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: semantic
-        with:
-          environment: production
-          sourcemaps: ./dist
-          version: ${{ needs.release.outputs.new_version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   backmerge:
     name: Backmerge to development
@@ -75,7 +39,7 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-      - name: Merge master in development
+      - name: Merge main in development
         run: |
           git checkout development
           git merge origin/main
@@ -85,4 +49,39 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello world"
+      - uses: actions/checkout@v2
+      - name: Build images
+        run: docker build . --file Dockerfile --tag tmp
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push images
+        run: |
+          IMAGE_ID=/$IMAGE_NAME
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          VERSION=${{ needs.release.outputs.new_version }}
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag tmp ghcr.io/bazinga/semantic:latest
+          docker tag tmp ghcr.io/bazinga/semantic:${{ needs.release.outputs.new_version }}
+          docker push ghcr.io/bazinga/semantic:latest
+          docker push ghcr.io/bazinga/semantic:${{ needs.release.outputs.new_version }}
+
+  sentry:
+    name: Create Sentry release
+    runs-on: ubuntu-latest
+    needs: [release, build-publish]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Run account container
+        run: docker run --name=tmp -d ghcr.io/bazinga/semantic:${{ needs.release.outputs.new_version }}
+      - name: Get dist source code
+        run: docker cp tmp:/usr/src/dist ./dist
+      - name: Sentry Release
+        run: echo "success"

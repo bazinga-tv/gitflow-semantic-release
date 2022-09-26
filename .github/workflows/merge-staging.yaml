@@ -25,16 +25,6 @@ jobs:
         with:
           text: ${{ github.event.pull_request.title }}
           regex: '^chore\(([A-Z]+-[0-9]+)\)'
-      - name: Debug
-        run: |
-          echo "regex : '${{ steps.regex-match.outputs.match == '' }}'"
-          echo "shouldRun : '${{ steps.check-pr.outputs.shouldRun }}'"
-      # - name: Precondition PR name
-      #   if: steps.regex-match.outputs.match == ''
-      #   run: exit 1
-      # - name: Precondition should run
-      #   if: steps.check-pr.outputs.shouldRun == 'false'
-      #   run: exit 1
       - name: Precondition
         if: steps.regex-match.outputs.match == '' || steps.check-pr.outputs.shouldRun == 'false'
         run: exit 1
