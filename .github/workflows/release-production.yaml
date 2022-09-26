@@ -50,23 +50,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build images
-        run: docker build . --file Dockerfile --tag tmp
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      - name: Push images
-        run: |
-          IMAGE_ID=/$IMAGE_NAME
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          VERSION=${{ needs.release.outputs.new_version }}
-
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag tmp ghcr.io/bazinga-tv/semantic:latest
-          docker tag tmp ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }}
-          docker push ghcr.io/bazinga-tv/semantic:latest
-          docker push ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to ghcr.io
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/bazinga-tv/semantic
+          tags: |
+            type=sha,format=long
+            type=semver,pattern={{version}},value=${{ needs.release.outputs.new_version }}
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: .
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: debug
+        run: echo "${{ steps.build.outputs.imageid }}"
 
   sentry:
     name: Create Sentry release
@@ -77,8 +88,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Login to ghcr.io
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run account container
         run: docker run --name=tmp -d ghcr.io/bazinga-tv/semantic:${{ needs.release.outputs.new_version }} sh -c "while :; do echo 'Hit CTRL+C'; sleep 1; done" # Needed to avoid the container from failing
       - name: Get dist source code
