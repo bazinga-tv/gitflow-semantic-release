@@ -12,6 +12,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import CreatePostUseCase from './usecase/create-post.usecase';
 import UpdatePostUseCase from './usecase/update-post.usecase';
+import FetchPostUseCase from './usecase/fetch-post.usecase';
 
 @Controller('posts')
 export class PostsController {
@@ -19,6 +20,7 @@ export class PostsController {
     private readonly postsService: PostsService,
     private readonly createPostUsecase: CreatePostUseCase,
     private readonly updatePostUsecase: UpdatePostUseCase,
+    private readonly fetchPostUsecase: FetchPostUseCase,
   ) {}
 
   @Post()
@@ -33,7 +35,7 @@ export class PostsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+    return this.fetchPostUsecase.handle(+id);
   }
 
   @Patch(':id')
