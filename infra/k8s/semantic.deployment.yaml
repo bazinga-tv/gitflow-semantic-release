@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  semantic-deployment
+  namespace: semantic
+  labels:
+    app:  semantic
+spec:
+  selector:
+    matchLabels:
+      app: semantic
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app:  semantic
+    spec:
+      containers:
+        - name:  semantic
+          image:  ghcr.io/bazinga-tv/semantic:latest
+      imagePullSecrets:
+        - name: ghcr
+      restartPolicy: Always
