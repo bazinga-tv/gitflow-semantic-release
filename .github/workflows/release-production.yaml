@@ -48,7 +48,7 @@ jobs:
           git merge origin/main
           git push
 
-  build-publish-v2:
+  build-publish:
     needs: release
     runs-on: ubuntu-latest
     outputs:
@@ -81,34 +81,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  build-publish:
-    needs: release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build images
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      - name: Push images
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          GITREF=$(echo $GITHUB_SHA | sed 's/.*\(.........\)/\1/')
-          VERSION=${{ needs.release.outputs.new_version }}
-
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$GITREF
-          docker push $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$GITREF
-
   sentry:
     name: Create Sentry release
     runs-on: ubuntu-latest
-    needs: build-publish-v2
+    needs: build-publish
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -121,7 +97,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run account container
-        run: docker run --name=tmp -d ${{ needs.build-publish-v2.outputs.image-name }} sh -c "while :; do echo 'Hit CTRL+C'; sleep 1; done" # Needed to avoid the container from failing
+        run: docker run --name=tmp -d ${{ needs.build-publish.outputs.image-name }} sh -c "while :; do echo 'Hit CTRL+C'; sleep 1; done" # Needed to avoid the container from failing
       - name: Get dist source code
         run: docker cp tmp:/app/dist ./dist
       - name: Sentry Release
