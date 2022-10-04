@@ -99,4 +99,6 @@ jobs:
       - name: Run account container
         run: docker create -v $(pwd)/dist:/app/dist ${{ needs.build-publish.outputs.image-name }}
       - name: listing dist
-        run: ls ./dist
+        run: |
+          ls
+          ls ./dist
