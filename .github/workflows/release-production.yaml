@@ -97,8 +97,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run account container
-        run: docker run --name=tmp -d ${{ needs.build-publish.outputs.image-name }} sh -c "while :; do echo 'Hit CTRL+C'; sleep 1; done" # Needed to avoid the container from failing
-      - name: Get dist source code
-        run: docker cp tmp:/app/dist ./dist
-      - name: Sentry Release
-        run: echo "success"
+        run: docker create -v /dist:/app/dist -d ${{ needs.build-publish.outputs.image-name }}
+      - name: listing dist
+        run: ls ./dist
