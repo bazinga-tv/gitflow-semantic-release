@@ -97,6 +97,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run account container
-        run: docker create -v /dist:/app/dist ${{ needs.build-publish.outputs.image-name }}
+        run: docker create -v ./dist:/app/dist ${{ needs.build-publish.outputs.image-name }}
       - name: listing dist
         run: ls ./dist
