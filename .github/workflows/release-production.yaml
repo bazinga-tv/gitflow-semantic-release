@@ -97,7 +97,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run account container
-        run: docker create -v $(pwd)/dist:/app/dist ${{ needs.build-publish.outputs.image-name }}
+        run: |
+          CONTAINER_ID=`docker create ${{ needs.build-publish.outputs.image-name }}`
+          docker cp $CONTAINER_ID:/app/dist ./
       - name: listing dist
         run: |
           ls
