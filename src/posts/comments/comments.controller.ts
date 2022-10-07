@@ -21,7 +21,7 @@ export class CommentsController {
 
   @Post()
   create(
-    @Param('posts') post: string,
+    @Param('post') post: string,
     @Body() createCommentDto: CreateCommentDto,
   ) {
     throw new Error('Custom failure');
