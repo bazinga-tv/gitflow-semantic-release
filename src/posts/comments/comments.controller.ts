@@ -10,14 +10,21 @@ import {
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import CreateCommentUsecase from './usecase/create-comment.usecase';
 
 @Controller('posts/:post/comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    private readonly commentsService: CommentsService,
+    readonly createCommentUsecase: CreateCommentUsecase,
+  ) {}
 
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentsService.create(createCommentDto);
+  create(
+    @Param('posts') post: string,
+    @Body() createCommentDto: CreateCommentDto,
+  ) {
+    return this.createCommentUsecase.handle(post, createCommentDto);
   }
 
   @Get()
