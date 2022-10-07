@@ -100,7 +100,13 @@ jobs:
         run: |
           CONTAINER_ID=`docker create ${{ needs.build-publish.outputs.image-name }}`
           docker cp $CONTAINER_ID:/app/dist ./
-      - name: listing dist
-        run: |
-          ls
-          ls ./dist
+      - name: Sentry Release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: semantic
+        with:
+          environment: production
+          sourcemaps: ./dist
+          version: ${{ needs.release.outputs.new_version }}

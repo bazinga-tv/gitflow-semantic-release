@@ -24,6 +24,7 @@ export class CommentsController {
     @Param('posts') post: string,
     @Body() createCommentDto: CreateCommentDto,
   ) {
+    throw new Error('Custom failure');
     return this.createCommentUsecase.handle(post, createCommentDto);
   }
 
