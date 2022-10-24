@@ -69,8 +69,8 @@ jobs:
         with:
           images: ghcr.io/bazinga-tv/semantic
           tags: |
-            type=sha,format=long
             type=semver,pattern={{version}},value=${{ needs.release.outputs.new_version }}
+            type=sha,format=long
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
