@@ -7,3 +7,6 @@ on:
 jobs:
   build-docker:
     uses: bazinga-tv/gitflow-semantic-release/.github/workflows/build-docker.yaml@reusable-workflows
+    with:
+      environment: dev
+      service-name: gitflow
